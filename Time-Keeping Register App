@@ -1,0 +1,34 @@
+!pip install pandas
+import pandas as pd
+from datetime import datetime
+import os
+# File path
+file_path = "time_register.csv"
+
+# Load existing register or create a new one
+if os.path.exists(file_path):
+    df = pd.read_csv(file_path)
+else:
+    df = pd.DataFrame(columns=["Name", "Start Time", "End Time", "Duration (minutes)"])
+# Start time function
+def log_start(name):
+    start_time = datetime.now()
+    return {"Name": name, "Start Time": start_time}
+# End time function
+def log_end(entry):
+    end_time = datetime.now()
+    duration = (end_time - entry["Start Time"]).total_seconds() / 60  # in minutes
+    entry["End Time"] = end_time
+    entry["Duration (minutes)"] = round(duration, 2)
+    return entry
+def save_entry(entry):
+    global df
+    df = pd.concat([df, pd.DataFrame([entry])], ignore_index=True)
+    df.to_csv(file_path, index=False)
+    print("Entry saved successfully!")
+# Example usage
+user_entry = log_start("Mampotje")  # Replace with dynamic input if needed
+# ...after some time
+user_entry = log_end(user_entry)
+save_entry(user_entry)
+df.tail()  # Show last few entries
